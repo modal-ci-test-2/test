@@ -1,0 +1,11 @@
+name: Modal runner test
+on:
+  push:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: modal-ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "Running on Modal"
+      - run: nproc && free -g
