@@ -31,9 +31,13 @@ jobs:
         run: |
           echo "cache hit: data created at $(cat cache-test/created-at)"
           ls -l cache-test
+
       - name: Check per-runner keys
         run: |
-          sudo ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub
-          sudo sshd -t && echo sshd-ok
-          sudo test -s /etc/ssl/private/ssl-cert-snakeoil.key && echo snakeoil-ok
-          grep -c generate_host_keys "$(command -v modal-gha-run)" || echo "old start script"
+          rc=0
+          sudo ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub || rc=1
+          sudo mkdir -p /run/sshd
+          sudo sshd -t && echo sshd-ok || rc=1
+          sudo test -s /etc/ssl/private/ssl-cert-snakeoil.key && echo snakeoil-ok || rc=1
+          grep -c generate_host_keys /usr/local/bin/modal-gha-run || { echo "old start script"; rc=1; }
+          exit $rc
