@@ -31,3 +31,9 @@ jobs:
         run: |
           echo "cache hit: data created at $(cat cache-test/created-at)"
           ls -l cache-test
+      - name: Check per-runner keys
+        run: |
+          sudo ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub
+          sudo sshd -t && echo sshd-ok
+          sudo test -s /etc/ssl/private/ssl-cert-snakeoil.key && echo snakeoil-ok
+          grep -c generate_host_keys "$(command -v modal-gha-run)" || echo "old start script"
